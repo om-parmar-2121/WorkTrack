@@ -7,7 +7,6 @@ const App = () => {
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/signup" element={<SignUp />} />
-      {/* Add home page route here when you create it */}
     </Routes>
   );
 };

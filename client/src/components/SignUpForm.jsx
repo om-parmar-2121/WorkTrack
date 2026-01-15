@@ -1,22 +1,75 @@
+import { useState } from "react";
+
 const SignUpForm = () => {
+
+  const SignUpData = {
+    role: '',
+    fullName: '',
+    email: '',
+    password: ''
+  }
+
+  const [role, setRole] = useState('')
+  const [fName, setFName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const submitForm = (e) => {
+    e.preventDefault()
+    SignUpData.role = role
+    SignUpData.fullName = fName
+    SignUpData.email = email
+    SignUpData.password = password
+
+  }
+
+  const fullNameSubmit = (e) => {
+    setFName(e.target.value)
+  }
+
+  const emailSubmit = (e) => {
+    setEmail(e.target.value)
+  }
+
+  const passwordSubmit = (e) => {
+    setPassword(e.target.value)
+  }
+
   return (
     <div>
-        <form className="space-y-3">
+        <form
+          className="space-y-3 sm:space-y-4"
+          onSubmit={submitForm}
+          >
           {/* Role */}
-          <div className="space-y-1">
-            <label className="block text-sm font-medium text-gray-600">Select Role</label>
+          <div className="space-y-2 sm:space-y-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-600">Select Role</label>
             <div className="flex gap-2">
               <button
                 type="button"
-                className="flex-1 px-4 py-3 border rounded-md border-gray-400 bg-slate-50 text-gray-700 hover:border-blue-600 hover:text-blue-600 transition-colors cursor-pointer"
+                className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-md transition-colors cursor-pointer ${
+                  role === 'HR'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'border-gray-400 bg-slate-50 text-gray-700 hover:border-blue-600 hover:text-blue-600'
+                }`}
+                onClick={(e) => {
+                  setRole('HR')
+                }}
               >
-                Employee
+                HR
               </button>
               <button
                 type="button"
-                className="flex-1 px-4 py-3 border rounded-md border-gray-400 bg-slate-50 text-gray-700 hover:border-blue-600 hover:text-blue-600 transition-colors cursor-pointer"
+                className={`flex-1 px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base border rounded-md transition-colors cursor-pointer ${
+                  role === 'Employee'
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'border-gray-400 bg-slate-50 text-gray-700 hover:border-blue-600 hover:text-blue-600'
+                }`}
+                onClick={(e) => {
+                  setRole('Employee')
+                }}
               >
-                HR
+                Employee
               </button>
             </div>
           </div>
@@ -28,7 +81,9 @@ const SignUpForm = () => {
               id="fullname"
               name="fullname"
               placeholder="Full Name"
-              className="w-full px-4 py-3 bg-slate-50 border border-gray-400 rounded-md placeholder-gray-800 focus:outline-none focus:border-blue-600 hover:border-blue-600"
+              value={fName}
+              onChange={fullNameSubmit}
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-gray-400 rounded-md placeholder-gray-800 focus:outline-none focus:border-blue-600 hover:border-blue-600"
               required
             />
           </div>
@@ -40,7 +95,9 @@ const SignUpForm = () => {
               id="email"
               name="email"
               placeholder="Email"
-              className="w-full px-4 py-3 bg-slate-50 border border-gray-400 rounded-md placeholder-gray-800 focus:outline-none focus:border-blue-600 transition-colors hover:border-blue-600"
+              value={email}
+              onChange={emailSubmit}
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-gray-400 rounded-md placeholder-gray-800 focus:outline-none focus:border-blue-600 transition-colors hover:border-blue-600"
               required
             />
           </div>
@@ -52,7 +109,9 @@ const SignUpForm = () => {
               id="password"
               name="password"
               placeholder="Password"
-              className="w-full px-4 py-3 bg-slate-50 border border-gray-400 rounded-md placeholder-gray-800 focus:outline-none focus:border-blue-600 transition-colors hover:border-blue-600"
+              value={password}
+              onChange={passwordSubmit}
+              className="w-full px-3 sm:px-4 py-2 sm:py-3 text-sm sm:text-base bg-slate-50 border border-gray-400 rounded-md placeholder-gray-800 focus:outline-none focus:border-blue-600 transition-colors hover:border-blue-600"
               required
             />
           </div>
@@ -60,7 +119,7 @@ const SignUpForm = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-700 text-white py-3 rounded-md font-medium hover:bg-blue-800 transition-colors mt-6"
+            className="w-full bg-blue-700 text-white py-2 sm:py-3 text-sm sm:text-base rounded-md font-medium hover:bg-blue-800 transition-colors mt-4 sm:mt-6"
           >
             Sign Up
           </button>
