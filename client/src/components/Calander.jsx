@@ -24,51 +24,49 @@ const Calander = () => {
     { day: 20, status: "weekend" },
     { day: 21, status: "present" },
     { day: 22, status: "present" },
-    { day: 23, status: "present" },
-    { day: 24, status: "present" },
-    { day: 25, status: "present" },
-    { day: 26, status: "weekend" },
-    { day: 27, status: "weekend" },
-    { day: 28, status: "present" },
-    { day: 29, status: "present" },
-    { day: 30, status: "present" },
-    { day: 31, status: "present" },
+    { day: 23, status: "null" },
+    { day: 24, status: "null" },
+    { day: 25, status: "null" },
+    { day: 26, status: "null" },
+    { day: 27, status: "null" },
+    { day: 28, status: "null" },
+    { day: 29, status: "null" },
+    { day: 30, status: "null" },
+    { day: 31, status: "null" },
   ];
 
   const weekDays = ["s", "m", "t", "w", "t", "f", "s"];
 
   return (
-    <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-400 shadow-sm lg:row-span-2">
-      <h2 className="text-2xl font-bold text-center mb-5 border-b-2 border-blue-400 pb-4">
+    <div className="rounded-lg p-4shadow-sm h-fit">
+      <h2 className="text-xl font-bold text-center mb-3 border-b border-gray-400 pb-2">
         Calendar
       </h2>
 
-      {/* Week days header */}
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className="grid grid-cols-7 gap-1 mb-1">
         {weekDays.map((day, index) => (
           <div
             key={index}
-            className="text-center font-bold text-blue-500 text-sm"
+            className="text-center font-bold text-gray-600-500 text-xs"
           >
-            {" "}
-            {day}{" "}
+            {day}
           </div>
         ))}
       </div>
 
-      {/* Calendar days */}
       <div className="grid grid-cols-7 gap-1">
-        {calendarDays.map((dayObj) => (
+        {calendarDays.map((dayObj, index) => (
           <div
-            key={dayObj.day}
+            key={index}
             className="flex justify-center items-center py-0.5"
           >
             <div
               className={`
-                      w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
-                      ${dayObj.status === "present" ? "border border-green-500 text-green-500" : ""}
-                      ${dayObj.status === "absent" ? "border border-red-500 text-red-500" : ""}
-                      ${dayObj.status === "weekend" ? "border border-blue-400" : ""}
+                      w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold
+                      ${dayObj.status === "present" ? "text-green-500" : ""}
+                      ${dayObj.status === "absent" ? "text-red-500" : ""}
+                      ${dayObj.status === "weekend" ? "text-blue-500" : ""}
+                      ${dayObj.status === "null" ? "text-gray-300" : ""}
                       ${!dayObj.status ? "text-blue-500" : ""}
                     `}
             >
