@@ -44,12 +44,6 @@ const employeeSchema = new mongoose.Schema(
       trim: true,
     },
 
-    departmentId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Department",
-      default: null,
-    },
-
     workplace: {
       type: String,
       required: true,
@@ -72,12 +66,7 @@ const employeeSchema = new mongoose.Schema(
     dateOfJoining: {
       type: Date,
       required: true,
-    },
-
-    avatarUrl: {
-      type: String,
-      default: "",
-    },
+    }
     
   },
   {

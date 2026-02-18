@@ -31,11 +31,6 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
-
-    lastLoginAt: {
-      type: Date,
-      default: null,
-    },
     
   },
   {
