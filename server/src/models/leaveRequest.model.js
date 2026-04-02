@@ -8,18 +8,6 @@ const leaveSchema = new mongoose.Schema(
       required: true,
     },
 
-    type: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
-    reason: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-
     startDate: {
       type: Date,
       required: true,
@@ -28,6 +16,12 @@ const leaveSchema = new mongoose.Schema(
     endDate: {
       type: Date,
       required: true,
+    },
+    
+    reason: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
     status: {
@@ -40,17 +34,6 @@ const leaveSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
-    },
-
-    decisionAt: {
-      type: Date,
-      default: null,
-    },
-
-    notes: {
-      type: String,
-      trim: true,
-      default: "",
     },
     
   },

@@ -6,6 +6,7 @@ const env = {
   COOKIE_EXPIRES: process.env.COOKIE_EXPIRES || 7,
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRES: process.env.JWT_EXPIRES || "7d",
+  CLIENT_URL: process.env.CLIENT_URL || "http://localhost:5173",
 };
 
 if (!env.MONGODB_URL) {
