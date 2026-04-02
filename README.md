@@ -8,9 +8,10 @@ For demo and learning purposes only. Not intended for production use.
 
 ```text
 StaffSphere/
-├── client/        # React app for users, HR, and dashboards
-├── server/        # Express REST API and MongoDB models
-└── README.md      # Project documentation
+├── client/ # React app for users, HR, and dashboards
+├── server/ # Express REST API and MongoDB models
+├── .gitignore # Git ignore rules
+└── README.md # Project documentation
 ```
 
 ## Features
