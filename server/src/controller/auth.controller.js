@@ -54,8 +54,8 @@ export const register = asyncHandler(async (req, res, next) => {
     .status(201)
     .cookie("token", token,{ // Sending the token to decode
         httpOnly: true, // The cookie cannot be accessed from JavaScript (document.cookie).Protects against XSS (Cross-Site Scripting) attacks. Always true for auth cookies like JWTs.
-        secure: false,
-        sameSite: "lax", // Controls when the cookie is sent in cross-site requests.
+        secure: true,
+        sameSite: "None", // Controls when the cookie is sent in cross-site requests.
         expires: new Date(Date.now() + env.COOKIE_EXPIRES * 60 * 60 * 24 * 1000),
     })
     .json({
@@ -89,8 +89,8 @@ export const login = asyncHandler(async (req, res, next) => {
   res.status(200)
     .cookie("token", token,{
         httpOnly: true,
-        secure: false,
-        sameSite: "lax",
+        secure: true,
+        sameSite: "None",
         expires: new Date(Date.now() + env.COOKIE_EXPIRES * 60 * 60 * 24 * 1000),
     })
     .json({
@@ -161,6 +161,8 @@ export const logout = asyncHandler(async (req, res, next) => {
     .cookie("token", "",{
         expires: new Date(Date.now()),
         httpOnly: true,
+        secure: true,
+        sameSite: "None",
     })
     .json({
         success: true,
