@@ -1,104 +1,112 @@
-import { useState } from "react";
-import Calander from "../../components/Calander";
+import { useEffect, useMemo, useState } from "react";
 import LeaveApplicationForm from "../../components/employee/LeaveApplicationForm";
 import EmpTitleCard from "../../components/employee/EmpTitleCard";
 import EmpNotification from "../../components/employee/EmpNotification";
 import EmpDashboardDetail from "../../components/employee/EmpDashboardDetail";
+import LeaveOverview from "../../components/employee/LeaveOverview";
+import RecentLeaveActivity from "../../components/employee/RecentLeaveActivity";
+import { getMyLeaveRequests } from "../../services/leaveService";
 
 const EmpDashboard = () => {
   const [showLeaveForm, setShowLeaveForm] = useState(false);
+  const [leaveRequests, setLeaveRequests] = useState([]);
+  const [isLoadingLeaves, setIsLoadingLeaves] = useState(true);
 
-  const leaveStats = {
-    total: 20,
-    used: 8,
-    pending: 2,
-    remaining: 10,
-  };
+  useEffect(() => {
+    const loadLeaveRequests = async () => {
+      try {
+        setIsLoadingLeaves(true);
+        const leaveRequestsList = await getMyLeaveRequests();
+        setLeaveRequests(leaveRequestsList);
+      } catch (error) {
+        if (error.message?.toLowerCase().includes("no leave requests found")) {
+          setLeaveRequests([]);
+          return;
+        }
 
-  const attendanceData = {
-    totalWorkingDays: 22,
-    present: 18,
-    absent: 4,
-  };
+        setLeaveRequests([]);
+      } finally {
+        setIsLoadingLeaves(false);
+      }
+    };
+
+    loadLeaveRequests();
+  }, []);
+
+  const leaveStats = useMemo(() => {
+    return leaveRequests.reduce(
+      (acc, leave) => {
+        const normalizedStatus = (leave?.status || "").toLowerCase();
+        acc.total += 1;
+
+        if (normalizedStatus === "approved") acc.approved += 1;
+        if (normalizedStatus === "pending") acc.pending += 1;
+        if (normalizedStatus === "rejected") acc.rejected += 1;
+
+        return acc;
+      },
+      { total: 0, approved: 0, pending: 0, rejected: 0 },
+    );
+  }, [leaveRequests]);
+
+  const recentLeaves = useMemo(
+    () => [...leaveRequests].slice(0, 3),
+    [leaveRequests],
+  );
+
+  const statCards = [
+    {
+      title: "Total Requests",
+      value: leaveStats.total,
+      tone: "text-blue-700 border-2 border-blue-200",
+    },
+    {
+      title: "Approved",
+      value: leaveStats.approved,
+      tone: "text-emerald-700 border-2 border-emerald-200",
+    },
+    {
+      title: "Pending",
+      value: leaveStats.pending,
+      tone: "text-amber-700 border-2 border-amber-200",
+    },
+    {
+      title: "Rejected",
+      value: leaveStats.rejected,
+      tone: "text-rose-700 border-2 border-rose-200",
+    },
+  ];
 
   return (
     <div className="bg-gray-50 h-screen overflow-hidden flex flex-col">
-      <EmpTitleCard onApplyLeave={() => setShowLeaveForm(true)} />
+      <EmpTitleCard />
 
-      <div className="flex-1 overflow-hidden">
-        <div className="max-w-7xl mx-auto h-full p-6">
-          <div className="grid grid-cols-2 gap-6 h-full">
-            
-            {/* Left Block */}
-            <div className="flex flex-col gap-6 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-              <style>{`
-                div::-webkit-scrollbar {
-                  display: none;
-                }
-              `}</style>
-
-              {/* Notification Section */}
-              <EmpNotification />
-
-              {/* Employee Details */}
+      <div className="flex-1 overflow-hidden px-6 pb-4">
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
+            <div className="xl:col-span-4 space-y-4">
               <EmpDashboardDetail />
 
-              {/* Leave Data*/}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Leave Summary</h2>
-                <div className="grid grid-cols-4 gap-4 text-sm">
-                  <div>
-                    <label className="text-gray-600 font-medium">Total</label>
-                    <p className="text-gray-900 mt-1 text-xl font-bold">{leaveStats.total}</p>
-                  </div>
-                  <div>
-                    <label className="text-gray-600 font-medium">Remaining</label>
-                    <p className="text-gray-900 mt-1 text-xl font-bold">{leaveStats.remaining}</p>
-                  </div>
-                  <div>
-                    <label className="text-gray-600 font-medium">Used</label>
-                    <p className="text-gray-900 mt-1 text-xl font-bold">{leaveStats.used}</p>
-                  </div>
-                  <div>
-                    <label className="text-gray-600 font-medium">Pending</label>
-                    <p className="text-gray-900 mt-1 text-xl font-bold">{leaveStats.pending}</p>
-                  </div>
-                </div>
-              </div>
+              <RecentLeaveActivity
+                isLoadingLeaves={isLoadingLeaves}
+                recentLeaves={recentLeaves}
+              />
             </div>
 
-            <div className="flex flex-col gap-6 overflow-hidden">
+            <div className="xl:col-span-8 space-y-4">
+              <LeaveOverview
+                statCards={statCards}
+                onNewLeave={() => setShowLeaveForm(true)}
+              />
 
-              {/* Calendar */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6 flex-1 overflow-hidden">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Calendar</h2>
-                <Calander />
-              </div>
-
-              {/* Attendance Summary */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Attendance Summary:</h2>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Total Working Days:</span>
-                    <span className="font-bold text-gray-900">{attendanceData.totalWorkingDays}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Present:</span>
-                    <span className="font-bold text-green-600">{attendanceData.present}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Absent:</span>
-                    <span className="font-bold text-red-600">{attendanceData.absent}</span>
-                  </div>
-                </div>
+              <div>
+              <EmpNotification />
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Leave Form */}
       {showLeaveForm && (
         <LeaveApplicationForm onClose={() => setShowLeaveForm(false)} />
       )}

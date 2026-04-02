@@ -1,67 +1,169 @@
+import { useEffect, useState } from "react";
+import { getEmployees } from "../../services/employeeService";
+import { getTodayAttendanceStatus, markAttendance } from "../../services/attendanceService";
+import { LineWobble } from 'ldrs/react'
+import 'ldrs/react/LineWobble.css'
+
 const EmpAttendList = () => {
-  const Attendance = [
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Present" },
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Late" },
-    { id: "E001", name: "Alice Johnson", dept: "Engineering", status: "Present" },
-    { id: "E002", name: "Brian Smith", dept: "Design", status: "Present" },
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Late" },
-    { id: "E004", name: "Diego Martinez", dept: "Sales", status: "Absent" },
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Present" },
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Late" },
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Present" },
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Late" },
-    { id: "E001", name: "Alice Johnson", dept: "Engineering", status: "Present" },
-    { id: "E002", name: "Brian Smith", dept: "Design", status: "Present" },
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Late" },
-    { id: "E004", name: "Diego Martinez", dept: "Sales", status: "Absent" },
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Present" },
-    { id: "E003", name: "Chloe Kim", dept: "HR", status: "Late" },
-  ];
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [markedAttendance, setMarkedAttendance] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState({});
+  const [todayDate] = useState(new Date().toISOString().split('T')[0]);
+
+  useEffect(() => {
+    const fetchEmployeesAndTodayStatus = async () => {
+      try {
+        setLoading(true);
+        const [employeeResponse, todayResponse] = await Promise.all([
+          getEmployees(),
+          getTodayAttendanceStatus(),
+        ]);
+
+        setEmployees(employeeResponse || []);
+        setMarkedAttendance(todayResponse || {});
+        setError(null);
+      } catch (err) {
+        setError(err.message || "Failed to fetch employees");
+        setEmployees([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmployeesAndTodayStatus();
+  }, []);
+
+  const handleMarkAttendance = async (employeeId, status) => {
+    if (markedAttendance[employeeId]) {
+      alert("Attendance already marked for today.");
+      return;
+    }
+
+    try {
+      setIsSubmitting((prev) => ({ ...prev, [employeeId]: true }));
+      
+      const response = await markAttendance({
+        employeeId,
+        status,
+        date: todayDate,
+      });
+
+      setMarkedAttendance((prev) => ({
+        ...prev,
+        [employeeId]: response?.attendance?.status || status,
+      }));
+    } catch (err) {
+      console.error("Failed to mark attendance:", err);
+      alert(`Error marking ${status}: ${err.message}`);
+    } finally {
+      setIsSubmitting((prev) => ({ ...prev, [employeeId]: false }));
+    }
+  };
+
+  const isAttendanceMarked = (employeeId) => {
+    return Boolean(markedAttendance[employeeId]);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-10">
+          <LineWobble
+            size="80"
+            stroke="5"
+            bgOpacity="0.1"
+            speed="1.75"
+            color="black"
+          />
+        </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+        <div className="flex justify-center items-center py-8">
+          <p className="text-red-500">Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
-      <div className="overflow-y-scroll no-scrollbar max-h-[550px]">
-        <table className="w-full border-collapse">
+      <div className="mb-4">
+        <p className="text-sm font-semibold text-gray-700">
+          Today's Date: <span className="text-blue-600">{new Date(todayDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+        </p>
+      </div>
+      <div className="overflow-y-scroll no-scrollbar max-h-137.5">
+        <table className="w-full border-collapse table-fixed">
           <thead>
             <tr>
-              <th className="px-3 py-3 border-b border-gray-200 text-left text-sm font-semibold">
+              <th className="w-1/4 px-4 py-3 border-b border-gray-200 text-left text-sm font-semibold">
                 Employee Name
               </th>
-              <th className="px-3 py-3 border-b border-gray-200 text-left text-sm font-semibold">
+              <th className="w-1/4 px-4 py-3 border-b border-gray-200 text-left text-sm font-semibold">
                 Department
               </th>
-              <th className="px-3 py-3 border-b border-gray-200 text-left text-sm font-semibold">
+              <th className="w-1/4 px-4 py-3 border-b border-gray-200 text-left text-sm font-semibold">
                 ID
               </th>
-              <th className="px-3 py-3 border-b border-gray-200 text-left text-sm font-semibold">
-                Status
+              <th className="w-1/4 px-4 py-3 border-b border-gray-200 text-left text-sm font-semibold">
+                Action
               </th>
             </tr>
           </thead>
           <tbody>
-            {Attendance.map((elem, index) => {
-              const statusClasses = {
-                Present: "✅",
-                Absent: "❌",
-                Late: "⏳",
-              };
-
+            {employees.map((elem, index) => {
+              const isMarked = isAttendanceMarked(elem.employeeId);
+              const markedStatus = markedAttendance[elem.employeeId];
+              
               return (
-                <tr key={`${elem.id}-${elem.name}-${elem.status}-${index}`}>
-                  <td className="px-3 py-3 border-b border-gray-200 text-sm">
-                    {elem.name}
+                <tr key={`${elem.employeeId}-${index}`}>
+                  <td className="px-4 py-3 border-b border-gray-200 text-sm">
+                    {elem.fullName}
                   </td>
-                  <td className="px-3 py-3 border-b border-gray-200 text-sm">
-                    {elem.dept}
+                  <td className="px-4 py-3 border-b border-gray-200 text-sm">
+                    {elem.department}
                   </td>
-                  <td className="px-3 py-3 border-b border-gray-200 text-sm">
-                    {elem.id}
+                  <td className="px-4 py-3 border-b border-gray-200 text-sm">
+                    {elem.employeeId}
                   </td>
-                  <td className="px-3 py-3 border-b border-gray-200 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div>{statusClasses[elem.status]}</div>
-                      <div>{elem.status}</div>
-                    </div>
+                  <td className="px-4 py-3 border-b border-gray-200 text-sm">
+                    {isMarked ? (
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`px-3 py-1.5 border-2 rounded-md text-sm font-semibold cursor-not-allowed ${
+                            markedStatus === "Present"
+                              ? "bg-green-50 border-green-300 text-green-400"
+                              : "bg-red-50 border-red-300 text-red-400"
+                          }`}
+                        >
+                          Marked ✓
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          disabled={isSubmitting[elem.employeeId]}
+                          onClick={() => handleMarkAttendance(elem.employeeId, "Present")}
+                          className="rounded-md font-semibold bg-green-100 border-2 border-green-200 text-green-800 px-3 py-1.5 hover:bg-green-200 transition disabled:opacity-70"
+                        >
+                          Present
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isSubmitting[elem.employeeId]}
+                          onClick={() => handleMarkAttendance(elem.employeeId, "Absent")}
+                          className="rounded-md font-semibold bg-red-100 border-2 border-red-200 text-red-800 px-3 py-1.5 hover:bg-red-200 transition disabled:opacity-70"
+                        >
+                          Absent
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               );

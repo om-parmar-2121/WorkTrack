@@ -1,165 +1,141 @@
+import { useEffect, useState } from "react";
 import { SquarePen } from "lucide-react";
+import { getEmployees } from "../../services/employeeService";
+import { LineWobble } from 'ldrs/react'
+import 'ldrs/react/LineWobble.css'
+import EmployeeEditModal from "./EmployeeEditModal";
 
 const EmployeeTable = () => {
-  const employees = [
-    {
-      name: "Riyad Ahmod",
-      id: 1828267,
-      email: "uiriyad@gmail.com",
-      department: "Art & Design",
-      designation: "Sr Product Designer",
-    },
-    {
-      name: "Charles T",
-      id: 1828267,
-      email: "ahmedriyad338@gmail.com",
-      department: "Development",
-      designation: "Sr UI Designer",
-    },
-    {
-      name: "Nahid Miah",
-      id: 1828267,
-      email: "uiriyad1999@gmail.com",
-      department: "UI/UX Design",
-      designation: "Jr UX Designer",
-    },
-    {
-      name: "Parvej Reza",
-      id: 1828267,
-      email: "uireza200@gmail.com",
-      department: "Development",
-      designation: "Sr Developer",
-    },
-    {
-      name: "Motiur Rahman",
-      id: 1828267,
-      email: "uiriyad@gmail.com",
-      department: "UI/UX Design",
-      designation: "Sr Motion Designer",
-    },
-    {
-      name: "Atik Miah",
-      id: 1828267,
-      email: "uixatik123@gmail.com",
-      department: "Development",
-      designation: "Jr Product Manager",
-    },
-    {
-      name: "Parvej Reza",
-      id: 1828267,
-      email: "uireza200@gmail.com",
-      department: "Development",
-      designation: "Sr Developer",
-    },
-    {
-      name: "Atik Miah",
-      id: 1828267,
-      email: "uixatik123@gmail.com",
-      department: "Development",
-      designation: "Jr Product Manager",
-    },
-    {
-      name: "Motiur Rahman",
-      id: 1828267,
-      email: "uiriyad@gmail.com",
-      department: "UI/UX Design",
-      designation: "Sr Motion Designer",
-    },
-    {
-      name: "Riyad Ahmod",
-      id: 1828267,
-      email: "uiriyad@gmail.com",
-      department: "Art & Design",
-      designation: "Sr Product Designer",
-    },
-    {
-      name: "Charles T",
-      id: 1828267,
-      email: "ahmedriyad338@gmail.com",
-      department: "Development",
-      designation: "Sr UI Designer",
-    },
-    {
-      name: "Nahid Miah",
-      id: 1828267,
-      email: "uiriyad1999@gmail.com",
-      department: "UI/UX Design",
-      designation: "Jr UX Designer",
-    },
-    {
-      name: "Parvej Reza",
-      id: 1828267,
-      email: "uireza200@gmail.com",
-      department: "Development",
-      designation: "Sr Developer",
-    },
-    {
-      name: "Motiur Rahman",
-      id: 1828267,
-      email: "uiriyad@gmail.com",
-      department: "UI/UX Design",
-      designation: "Sr Motion Designer",
-    },
-    {
-      name: "Atik Miah",
-      id: 1828267,
-      email: "uixatik123@gmail.com",
-      department: "Development",
-      designation: "Jr Product Manager",
-    },
-    {
-      name: "Parvej Reza",
-      id: 1828267,
-      email: "uireza200@gmail.com",
-      department: "Development",
-      designation: "Sr Developer",
-    },
-    {
-      name: "Atik Miah",
-      id: 1828267,
-      email: "uixatik123@gmail.com",
-      department: "Development",
-      designation: "Jr Product Manager",
-    },
-    {
-      name: "Motiur Rahman",
-      id: 1828267,
-      email: "uiriyad@gmail.com",
-      department: "UI/UX Design",
-      designation: "Sr Motion Designer",
-    },
-  ];
+  const [employees, setEmployees] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  useEffect(() => {
+    setIsLoading(true);
+    setErrorMessage("");
+
+    getEmployees()
+      .then((employeesList) => {
+        setEmployees(employeesList || []);
+      })
+      .catch((error) => {
+        if (error?.message === "No employees found") {
+          setEmployees([]);
+          return;
+        }
+
+        setErrorMessage(error?.message || "Unable to load employees");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
+  const handleEditClick = (employee) => {
+    setSelectedEmployee(employee);
+  };
+
+  const handleCloseModal = () => {
+    setSelectedEmployee(null);
+  };
+
+  const handleEmployeeUpdated = (updatedEmployee) => {
+    if (!updatedEmployee?._id) return;
+
+    setEmployees((prevEmployees) =>
+      prevEmployees.map((employee) => {
+        if (String(employee._id) !== String(updatedEmployee._id)) {
+          return employee;
+        }
+
+        return {
+          ...employee,
+          position: updatedEmployee.position ?? employee.position,
+          department: updatedEmployee.department ?? employee.department,
+          workplace: updatedEmployee.workplace ?? employee.workplace,
+        };
+      }),
+    );
+
+    setSelectedEmployee((prevSelected) => {
+      if (!prevSelected || String(prevSelected._id) !== String(updatedEmployee._id)) {
+        return prevSelected;
+      }
+
+      return {
+        ...prevSelected,
+        position: updatedEmployee.position ?? prevSelected.position,
+        department: updatedEmployee.department ?? prevSelected.department,
+        workplace: updatedEmployee.workplace ?? prevSelected.workplace,
+      };
+    });
+  };
 
   return (
-    <div className="p-5 text-blue-900 bg-blue-100 border border-blue-400 rounded h-full overflow-y-scroll no-scrollbar">
+    <div className="p-5 bg-white rounded-xl border border-gray-200">
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse">
         <thead>
-          <tr className="bg-blue-200 border-b-2 border-blue-400">
-            <th className="text-left p-3 font-semibold">Name</th>
-            <th className="text-left p-3 font-semibold">ID</th>
-            <th className="text-left p-3 font-semibold">Email</th>
-            <th className="text-left p-3 font-semibold">Department</th>
-            <th className="text-left p-3 font-semibold">Designation</th>
-            <th className="text-left p-3 font-semibold">Action</th>
+          <tr className="bg-blue-50 border-b border-blue-300">
+            <th className="text-left px-4 py-3 font-semibold text-blue-900">Name</th>
+            <th className="text-left px-4 py-3 font-semibold text-blue-900">ID</th>
+            <th className="text-left px-4 py-3 font-semibold text-blue-900">Email</th>
+            <th className="text-left px-4 py-3 font-semibold text-blue-900">Department</th>
+            <th className="text-left px-4 py-3 font-semibold text-blue-900">Designation</th>
+            <th className="text-left px-4 py-3 font-semibold text-blue-900">Action</th>
           </tr>
         </thead>
 
         <tbody>
-          {employees.map((emp, index) => {
+          {isLoading && (
+            <tr>
+              <td colSpan={6}>
+                <div className="flex items-center justify-center py-10">
+                  <LineWobble
+                    size="80"
+                    stroke="5"
+                    bgOpacity="0.1"
+                    speed="1.75"
+                    color="black"
+                  />
+                </div>
+              </td>
+            </tr>
+          )}
+
+          {!isLoading && errorMessage && (
+            <tr>
+              <td colSpan={6} className="px-4 py-4 text-center text-red-600 font-medium">
+                {errorMessage}
+              </td>
+            </tr>
+          )}
+
+          {!isLoading && !errorMessage && employees.length === 0 && (
+            <tr>
+              <td colSpan={6} className="px-4 py-4 text-center text-gray-500 font-medium">
+                No employees found.
+              </td>
+            </tr>
+          )}
+
+          {!isLoading && !errorMessage && employees.map((emp) => {
             return (
               <tr
-                key={index}
-                className="border-b border-blue-300 hover:bg-blue-50 transition-colors"
+                key={emp._id}
+                className="transition-colors border-b border-gray-300"
               >
-                <td className="p-3">{emp.name}</td>
-                <td className="p-3">{emp.id}</td>
-                <td className="p-3">{emp.email}</td>
-                <td className="p-3">{emp.department}</td>
-                <td className="p-3">{emp.designation}</td>
-                <td className="p-3">
+                <td className="px-4 py-3 text-gray-700">{emp.fullName || "-"}</td>
+                <td className="px-4 py-3 text-gray-700">{emp.employeeId || "-"}</td>
+                <td className="px-4 py-3 text-gray-700">{emp?.userId?.email || "-"}</td>
+                <td className="px-4 py-3 text-gray-700">{emp.department}</td>
+                <td className="px-4 py-3 text-gray-700">{emp.position}</td>
+                <td className="px-4 py-3">
                   <SquarePen
-                    className="cursor-pointer hover:text-blue-700 transition-colors"
+                    className="cursor-pointer text-gray-700 hover:text-gray-9 00 transition-colors"
                     size={18}
+                    onClick={() => handleEditClick(emp)}
                   />
                 </td>
               </tr>
@@ -167,6 +143,15 @@ const EmployeeTable = () => {
           })}
         </tbody>
       </table>
+      </div>
+
+      {selectedEmployee ? (
+        <EmployeeEditModal
+          employee={selectedEmployee}
+          onClose={handleCloseModal}
+          onSaved={handleEmployeeUpdated}
+        />
+      ) : null}
     </div>
   );
 };

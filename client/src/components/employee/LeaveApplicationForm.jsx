@@ -1,5 +1,6 @@
 import { X } from "lucide-react";
 import { useState } from "react";
+import { submitLeaveRequest } from "../../services/leaveService";
 
 const LeaveApplicationForm = ({ onClose }) => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,8 @@ const LeaveApplicationForm = ({ onClose }) => {
     endDate: "",
     reason: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -17,13 +20,31 @@ const LeaveApplicationForm = ({ onClose }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log("Leave Application Submitted:", formData);
-    // API call here
-    alert("Leave application submitted successfully!");
-    onClose();
+
+    if (!formData.startDate || !formData.endDate || !formData.reason.trim()) {
+      setErrorMessage("All fields are required");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
+      setErrorMessage("");
+
+      await submitLeaveRequest({
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        reason: formData.reason.trim(),
+      });
+
+      alert("Leave application submitted successfully!");
+      onClose();
+    } catch (error) {
+      setErrorMessage(error.message || "Failed to submit leave request");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -44,6 +65,11 @@ const LeaveApplicationForm = ({ onClose }) => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {errorMessage ? (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {errorMessage}
+            </div>
+          ) : null}
           
           {/* Date Range */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -97,15 +123,17 @@ const LeaveApplicationForm = ({ onClose }) => {
             <button
               type="button"
               onClick={onClose}
+              disabled={isSubmitting}
               className="flex-1 px-6 py-3 border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
+              disabled={isSubmitting}
               className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 shadow-md hover:shadow-lg transition-all"
             >
-              Submit Application
+              {isSubmitting ? "Submitting..." : "Submit Application"}
             </button>
           </div>
         </form>

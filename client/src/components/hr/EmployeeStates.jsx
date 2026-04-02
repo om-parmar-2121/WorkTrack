@@ -1,49 +1,73 @@
-const EmployeeStates = () => {
+import { LineWobble } from 'ldrs/react'
+import 'ldrs/react/LineWobble.css'
+
+const EmployeeStates = ({ stats, isLoading }) => {
+  const safeStats = stats || {
+    totalEmployees: 0,
+    activeEmployees: 0,
+    inactiveEmployees: 0,
+    presentToday: 0,
+    absentToday: 0,
+    pendingEmployees: 0,
+    leavePending: 0,
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-10">
+        <LineWobble
+          size="80"
+          stroke="5"
+          bgOpacity="0.1"
+          speed="1.75"
+          color="black"
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-400 shadow-sm">
-      <h2 className="text-2xl font-bold mb-6 border-b-2 border-blue-400 pb-4">
-        Employee States
-      </h2>
-      <div className="grid grid-cols-3 gap-6">
-        {/* Total Employee */}
-        <div className="border-r border-blue-300 pr-4">
-          <h3 className="text-sm font-semibold mb-3">Total Employee</h3>
-          <p className="text-4xl font-bold text-start">128</p>
-        </div>
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+      <div className="bg-white border-2 border-blue-200 rounded-xl p-4">
+        <p className="text-xs uppercase tracking-wide text-blue-600 font-semibold">Total Employees</p>
+        <p className="text-3xl font-bold text-gray-900 mt-2">{safeStats.totalEmployees}</p>
+        <p className="text-xs text-gray-500 mt-1">Total workforce</p>
+      </div>
 
-        {/* Active/Inactive */}
-        <div className="border-r border-blue-300 px-4">
-          <h3 className="text-sm font-semibold mb-3"> Status </h3>
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm">
-                <span className="font-semibold">Active:</span> 122
-              </p>
-            </div>
-            <div>
-              <p className="text-sm">
-                <span className="font-semibold">Inactive:</span> 6
-              </p>
-            </div>
-          </div>
-        </div>
+      <div className="bg-white border-2 border-emerald-200 rounded-xl p-4">
+        <p className="text-xs uppercase tracking-wide text-emerald-600 font-semibold">Active</p>
+        <p className="text-3xl font-bold text-gray-900 mt-2">{safeStats.activeEmployees}</p>
+        <p className="text-xs text-gray-500 mt-1">Active status</p>
+      </div>
 
-        {/* Present/Absent */}
-        <div className="pl-4">
-          <h3 className="text-sm font-semibold mb-3"> Attendance </h3>
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm">
-                <span className="font-semibold">Present:</span> 115
-              </p>
-            </div>
-            <div>
-              <p className="text-sm">
-                <span className="font-semibold">Absent:</span> 7
-              </p>
-            </div>
-          </div>
-        </div>
+      <div className="bg-white border-2 border-slate-200 rounded-xl p-4">
+        <p className="text-xs uppercase tracking-wide text-slate-600 font-semibold">Inactive</p>
+        <p className="text-3xl font-bold text-gray-900 mt-2">{safeStats.inactiveEmployees}</p>
+        <p className="text-xs text-gray-500 mt-1">Inactive status</p>
+      </div>
+
+      <div className="bg-white border-2 border-teal-200 rounded-xl p-4">
+        <p className="text-xs uppercase tracking-wide text-teal-600 font-semibold">Present</p>
+        <p className="text-3xl font-bold text-gray-900 mt-2">{safeStats.presentToday}</p>
+        <p className="text-xs text-gray-500 mt-1">Marked present</p>
+      </div>
+
+      <div className="bg-white border-2 border-rose-200 rounded-xl p-4">
+        <p className="text-xs uppercase tracking-wide text-rose-600 font-semibold">Absent</p>
+        <p className="text-3xl font-bold text-gray-900 mt-2">{safeStats.absentToday}</p>
+        <p className="text-xs text-gray-500 mt-1">Marked absent</p>
+      </div>
+
+      <div className="bg-white border-2 border-amber-200 rounded-xl p-4">
+        <p className="text-xs uppercase tracking-wide text-amber-600 font-semibold">Approvals</p>
+        <p className="text-3xl font-bold text-gray-900 mt-2">{safeStats.pendingEmployees}</p>
+        <p className="text-xs text-gray-500 mt-1">Pending approval</p>
+      </div>
+
+      <div className="bg-white border-2 border-orange-200 rounded-xl p-4">
+        <p className="text-xs uppercase tracking-wide text-orange-600 font-semibold">Leave</p>
+        <p className="text-3xl font-bold text-gray-900 mt-2">{safeStats.leavePending}</p>
+        <p className="text-xs text-gray-500 mt-1">Pending leaves</p>
       </div>
     </div>
   );

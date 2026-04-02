@@ -1,6 +1,6 @@
 import EmpLeaveReq from "../../components/hr/EmpLeaveReq";
 import NewEmpReq from "../../components/hr/NewEmpReq";
-import Sidebar from "../../components/Sidebar";
+import Sidebar from "../../components/common/Sidebar";
 
 const Approval = () => {
   return (
