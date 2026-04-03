@@ -7,6 +7,14 @@ import generateToken from "../utilities/generateToken.js";
 import { asyncHandler } from "../utilities/asyncHandler.utility.js";
 import { errorHandler } from "../utilities/errorHandler.utility.js";
 
+const getAuthCookieOptions = () => ({
+  httpOnly: true,
+  secure: env.NODE_ENV === "production",
+  sameSite: env.NODE_ENV === "production" ? "None" : "Lax",
+  path: "/",
+  expires: new Date(Date.now() + env.COOKIE_EXPIRES * 60 * 60 * 24 * 1000),
+});
+
 export const register = asyncHandler(async (req, res, next) => {
   const {role, fullName, email, password, phone, gender, birthdate, position, department, workplace, address} = req.body;
 
@@ -52,13 +60,7 @@ export const register = asyncHandler(async (req, res, next) => {
 
   res
     .status(201)
-    .cookie("token", token,{
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        path: "/",
-        expires: new Date(Date.now() + env.COOKIE_EXPIRES * 60 * 60 * 24 * 1000),
-    })
+    .cookie("token", token, getAuthCookieOptions())
     .json({
         success: true,
         message: "User created successfully",
@@ -88,13 +90,7 @@ export const login = asyncHandler(async (req, res, next) => {
     const employee = await Employee.findOne({ userId: user._id }).select("fullName");
 
   res.status(200)
-    .cookie("token", token,{
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-        path: "/",
-        expires: new Date(Date.now() + env.COOKIE_EXPIRES * 60 * 60 * 24 * 1000),
-    })
+    .cookie("token", token, getAuthCookieOptions())
     .json({
         success: true,
         message: "User logged in successfully",
@@ -159,12 +155,7 @@ export const approveUser = asyncHandler(async (req, res, next) => {
 export const logout = asyncHandler(async (req, res, next) => {
   res
     .status(200)
-  .clearCookie("token", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "None",
-    path: "/",
-    })
+    .clearCookie("token", getAuthCookieOptions())
     .json({
         success: true,
         message: "logout successful!"
