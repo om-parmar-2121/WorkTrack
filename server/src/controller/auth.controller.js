@@ -52,10 +52,11 @@ export const register = asyncHandler(async (req, res, next) => {
 
   res
     .status(201)
-    .cookie("token", token,{ // Sending the token to decode
-        httpOnly: true, // The cookie cannot be accessed from JavaScript (document.cookie).Protects against XSS (Cross-Site Scripting) attacks. Always true for auth cookies like JWTs.
+    .cookie("token", token,{
+        httpOnly: true,
         secure: true,
-        sameSite: "None", // Controls when the cookie is sent in cross-site requests.
+        sameSite: "None",
+        path: "/",
         expires: new Date(Date.now() + env.COOKIE_EXPIRES * 60 * 60 * 24 * 1000),
     })
     .json({
@@ -91,6 +92,7 @@ export const login = asyncHandler(async (req, res, next) => {
         httpOnly: true,
         secure: true,
         sameSite: "None",
+        path: "/",
         expires: new Date(Date.now() + env.COOKIE_EXPIRES * 60 * 60 * 24 * 1000),
     })
     .json({
@@ -131,7 +133,6 @@ export const approveUser = asyncHandler(async (req, res, next) => {
 
   if(!user) return next(new errorHandler("User not found", 404))
 
-  // It should redirect to login page if status is active....
   if(user.status === 'active') return next(new errorHandler("User is already approved", 400))
   
   user.status = 'active'
@@ -158,11 +159,11 @@ export const approveUser = asyncHandler(async (req, res, next) => {
 export const logout = asyncHandler(async (req, res, next) => {
   res
     .status(200)
-    .cookie("token", "",{
-        expires: new Date(Date.now()),
+  .clearCookie("token", {
         httpOnly: true,
         secure: true,
         sameSite: "None",
+    path: "/",
     })
     .json({
         success: true,
