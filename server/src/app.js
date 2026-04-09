@@ -1,62 +1,35 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import env from "./config/env.js";
+import userRouter from "./routes/user.route.js";
+import employeeRouter from "./routes/employee.route.js";
+import attendanceRouter from "./routes/attendance.route.js";
+import leaveRouter from "./routes/leave.route.js";
+import notificationRouter from "./routes/notification.route.js";
+import { errorMiddleware } from "./middleware/error.middleware.js";
 
-const buildUrl = (path) => {
-  if (!path) return API_BASE_URL;
-  if (/^https?:\/\//i.test(path)) return path;
-  return `${API_BASE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+const app = express();
+
+const corsOptions = {
+  origin: env.CLIENT_URL,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-const parseResponse = async (response) => {
-  const contentType = response.headers.get("content-type") || "";
-  if (contentType.includes("application/json")) return response.json();
-  return response.text();
-};
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
-// ADD THIS: read token from localStorage and send as Bearer
-const getAuthHeader = () => {
-  const storedUser = localStorage.getItem("staffsphereUser");
-  if (!storedUser) return {};
-  try {
-    const user = JSON.parse(storedUser);
-    if (user?.token) return { Authorization: `Bearer ${user.token}` };
-  } catch { /* ignore */ }
-  return {};
-};
+app.use(express.json());
+app.use(cookieParser());
 
-const request = async (path, options = {}) => {
-  const { body, headers = {}, ...restOptions } = options;
-  const isFormData = body instanceof FormData;
+app.use("/auth", userRouter);
+app.use("/employee", employeeRouter);
+app.use("/attendance", attendanceRouter);
+app.use("/leave", leaveRouter);
+app.use("/notification", notificationRouter);
 
-  const response = await fetch(buildUrl(path), {
-    credentials: "include",
-    ...restOptions,
-    headers: {
-      ...(isFormData ? {} : { "Content-Type": "application/json" }),
-      ...getAuthHeader(), // ADD THIS LINE
-      ...headers,
-    },
-    body: isFormData ? body : body !== undefined ? JSON.stringify(body) : undefined,
-  });
+app.use(errorMiddleware);
 
-  const data = await parseResponse(response);
-
-  if (!response.ok) {
-    const message =
-      (typeof data === "object" && data?.message) ||
-      `Request failed with status ${response.status}`;
-    throw new Error(message);
-  }
-
-  return data;
-};
-
-const api = {
-  request,
-  get: (path, options = {}) => request(path, { ...options, method: "GET" }),
-  post: (path, body, options = {}) => request(path, { ...options, method: "POST", body }),
-  patch: (path, body, options = {}) => request(path, { ...options, method: "PATCH", body }),
-  put: (path, body, options = {}) => request(path, { ...options, method: "PUT", body }),
-  delete: (path, options = {}) => request(path, { ...options, method: "DELETE" }),
-};
-
-export default api;
+export default app;
