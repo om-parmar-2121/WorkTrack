@@ -48,9 +48,10 @@ const Login = () => {
       const role = response?.responseData?.user?.role;
       const user = response?.responseData?.user;
       const employeeFullName = response?.responseData?.employee?.fullName;
+      const token = response?.responseData?.token;
 
       if (user) {
-        const storageUser = { ...user, employeeFullName };
+        const storageUser = { ...user, employeeFullName, token };
 
         localStorage.setItem("staffsphereUser", JSON.stringify(storageUser));
       }

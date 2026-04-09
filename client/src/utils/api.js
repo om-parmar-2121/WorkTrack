@@ -16,6 +16,23 @@ const parseResponse = async (response) => {
 	return response.text();
 };
 
+const getAuthHeader = () => {
+	const storedUser = localStorage.getItem("staffsphereUser");
+
+	if (!storedUser) return {};
+
+	try {
+		const user = JSON.parse(storedUser);
+		if (user?.token) {
+			return { Authorization: `Bearer ${user.token}` };
+		}
+	} catch {
+		// ignore malformed local storage values
+	}
+
+	return {};
+};
+
 const request = async (path, options = {}) => {
 	const { body, headers = {}, ...restOptions } = options;
 	const isFormData = body instanceof FormData;
@@ -25,6 +42,7 @@ const request = async (path, options = {}) => {
 		...restOptions,
 		headers: {
 			...(isFormData ? {} : { "Content-Type": "application/json" }),
+			...getAuthHeader(),
 			...headers,
 		},
 		body: isFormData
