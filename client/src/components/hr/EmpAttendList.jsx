@@ -145,12 +145,12 @@ const EmpAttendList = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 justify-items-start gap-2">
+                      <div className="flex items-center gap-2">
                         <button
                           type="button"
                           disabled={isSubmitting[elem.employeeId]}
                           onClick={() => handleMarkAttendance(elem.employeeId, "Present")}
-                          className="w-24 rounded-md border-2 border-green-200 bg-green-100 px-3 py-1.5 text-left font-semibold text-green-800 transition hover:bg-green-200 disabled:opacity-70"
+                          className="rounded-md border-2 border-green-200 bg-green-100 px-3 py-1.5 font-semibold text-green-800 transition hover:bg-green-200 disabled:opacity-70"
                         >
                           Present
                         </button>
@@ -158,7 +158,7 @@ const EmpAttendList = () => {
                           type="button"
                           disabled={isSubmitting[elem.employeeId]}
                           onClick={() => handleMarkAttendance(elem.employeeId, "Absent")}
-                          className="w-24 rounded-md border-2 border-red-200 bg-red-100 px-3 py-1.5 text-left font-semibold text-red-800 transition hover:bg-red-200 disabled:opacity-70"
+                          className="rounded-md border-2 border-red-200 bg-red-100 px-3 py-1.5 font-semibold text-red-800 transition hover:bg-red-200 disabled:opacity-70"
                         >
                           Absent
                         </button>
