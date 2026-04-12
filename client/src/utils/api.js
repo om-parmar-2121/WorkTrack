@@ -1,4 +1,10 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const isLocalHost =
+	typeof window !== "undefined" &&
+	["localhost", "127.0.0.1"].includes(window.location.hostname);
+
+const API_BASE_URL = isLocalHost
+	? import.meta.env.VITE_LOCAL_API_URL || "http://localhost:5000"
+	: import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const buildUrl = (path) => {
 	if (!path) return API_BASE_URL;
