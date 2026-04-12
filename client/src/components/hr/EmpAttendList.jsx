@@ -172,7 +172,7 @@ const EmpAttendList = () => {
         </table>
       </div>
 
-      <div className="space-y-3 md:hidden">
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto md:hidden">
         {employees.map((elem, index) => {
           const isMarked = isAttendanceMarked(elem.employeeId);
           const markedStatus = markedAttendance[elem.employeeId];

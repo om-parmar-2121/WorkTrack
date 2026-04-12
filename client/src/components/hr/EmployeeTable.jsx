@@ -145,7 +145,7 @@ const EmployeeTable = () => {
       </table>
       </div>
 
-      <div className="space-y-3 md:hidden">
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto md:hidden">
         {isLoading ? (
           <div className="flex items-center justify-center py-10">
             <LineWobble
