@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 
 const NavigationList = () => {
   const linkClasses = ({ isActive }) =>
-    `flex items-center gap-3 rounded-lg px-4 py-3 text-base font-medium transition-all duration-200 text-[#0752A2] ${
+    `flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-all duration-200 text-[#0752A2] md:px-4 md:text-base ${
       isActive
         ? "bg-blue-50"
         : "hover:bg-blue-50"

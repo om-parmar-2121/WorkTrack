@@ -3,8 +3,8 @@ import "ldrs/react/LineWobble.css";
 
 const RecentLeaveActivity = ({ isLoadingLeaves, recentLeaves }) => {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white border border-gray-200 rounded-xl p-4 md:p-6">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-xl font-bold text-gray-900">Recent Leave Activity</h2>
         {isLoadingLeaves ? (
           <span className="text-xs font-semibold text-blue-600">Loading...</span>
@@ -35,7 +35,7 @@ const RecentLeaveActivity = ({ isLoadingLeaves, recentLeaves }) => {
                   : "bg-amber-50 text-amber-700 border-amber-200";
 
             return (
-              <div key={leave._id} className="flex items-start justify-between gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50">
+              <div key={leave._id} className="flex flex-col gap-2 rounded-lg border border-gray-200 bg-gray-50 p-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-sm font-semibold text-gray-800">{leave.reason || "Leave request"}</p>
                   <p className="text-xs text-gray-500 mt-1">

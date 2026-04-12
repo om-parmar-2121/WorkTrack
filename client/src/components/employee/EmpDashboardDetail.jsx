@@ -42,7 +42,7 @@ const EmpDashboardDetail = () => {
   }, []);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
+    <div className="bg-white border border-gray-200 rounded-lg p-4 md:p-6">
       <h2 className="text-lg font-bold text-gray-900 mb-4">Employee Details</h2>
       {isLoading ? (
         <div className="flex items-center justify-center py-10">
@@ -55,7 +55,7 @@ const EmpDashboardDetail = () => {
           />
         </div>
       ) : null}
-      <div className="grid grid-cols-2 gap-4 text-sm">
+      <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
         <div>
           <label className="text-gray-600 font-medium">Department</label>
           <p className="text-gray-900 mt-1">{employeeData.department}</p>

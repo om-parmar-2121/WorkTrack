@@ -70,7 +70,7 @@ const ProfileCard = () => {
           type="button"
           onClick={handleLogout}
           disabled={isLogOut}
-          className="w-52 flex justify-center items-center rounded-lg border border-red-200 text-red-600 bg-red-100 px-4 py-2.5 text-sm font-semibold transition-colors gap-2 hover:border-red-400 disabled:opacity-70"
+          className="w-full flex items-center justify-start rounded-lg border border-red-200 bg-red-100 px-3 py-2.5 text-sm font-semibold text-red-600 transition-colors gap-2 hover:border-red-400 disabled:opacity-70 md:w-52 md:px-4"
         >
           <span>{isLogOut ? "Logging out..." : "Log Out"}</span>
           <LogOut className="h-4 w-4" />

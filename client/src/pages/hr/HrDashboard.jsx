@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Sidebar from "../../components/common/Sidebar";
 import HrHeader from "../../components/hr/HrHeader";
 import HrNotification from "../../components/hr/HrNotification";
 import EmployeeStates from "../../components/hr/EmployeeStates";
@@ -7,6 +6,7 @@ import { getPendingLeaveRequests } from "../../services/leaveService";
 import { getMyNotifications } from "../../services/notificationService";
 import { getEmployees, getPendingEmployees } from "../../services/employeeService";
 import { getTodayAttendanceStatus } from "../../services/attendanceService";
+import HrResponsiveLayout from "../../components/common/HrResponsiveLayout";
 
 const HrDashboard = () => {
   const [stats, setStats] = useState({
@@ -108,10 +108,8 @@ const HrDashboard = () => {
   }, []);
 
   return (
-    <div className="flex bg-gray-50 min-h-screen">
-      <Sidebar />
-
-      <div className="flex-1 p-5 overflow-y-auto">
+    <HrResponsiveLayout>
+      <div className="flex-1 overflow-y-auto p-3 pt-16 md:p-5 md:pt-5">
         {/* Header Section */}
         <HrHeader />
 
@@ -131,7 +129,7 @@ const HrDashboard = () => {
           </div>
         </div>
       </div>
-    </div>
+    </HrResponsiveLayout>
   );
 };
 

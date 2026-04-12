@@ -91,13 +91,13 @@ const EmpAttendList = () => {
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+    <div className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-3 shadow-sm md:p-4">
       <div className="mb-4">
         <p className="text-sm font-semibold text-gray-700">
           Today's Date: <span className="text-blue-600">{new Date(todayDate).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
         </p>
       </div>
-      <div className="overflow-y-scroll no-scrollbar max-h-137.5">
+      <div className="hidden min-h-0 flex-1 overflow-y-auto no-scrollbar md:block">
         <table className="w-full border-collapse table-fixed">
           <thead>
             <tr>
@@ -145,12 +145,12 @@ const EmpAttendList = () => {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2">
+                      <div className="grid grid-cols-1 justify-items-start gap-2">
                         <button
                           type="button"
                           disabled={isSubmitting[elem.employeeId]}
                           onClick={() => handleMarkAttendance(elem.employeeId, "Present")}
-                          className="rounded-md font-semibold bg-green-100 border-2 border-green-200 text-green-800 px-3 py-1.5 hover:bg-green-200 transition disabled:opacity-70"
+                          className="w-24 rounded-md border-2 border-green-200 bg-green-100 px-3 py-1.5 text-left font-semibold text-green-800 transition hover:bg-green-200 disabled:opacity-70"
                         >
                           Present
                         </button>
@@ -158,7 +158,7 @@ const EmpAttendList = () => {
                           type="button"
                           disabled={isSubmitting[elem.employeeId]}
                           onClick={() => handleMarkAttendance(elem.employeeId, "Absent")}
-                          className="rounded-md font-semibold bg-red-100 border-2 border-red-200 text-red-800 px-3 py-1.5 hover:bg-red-200 transition disabled:opacity-70"
+                          className="w-24 rounded-md border-2 border-red-200 bg-red-100 px-3 py-1.5 text-left font-semibold text-red-800 transition hover:bg-red-200 disabled:opacity-70"
                         >
                           Absent
                         </button>
@@ -170,6 +170,56 @@ const EmpAttendList = () => {
             })}
           </tbody>
         </table>
+      </div>
+
+      <div className="space-y-3 md:hidden">
+        {employees.map((elem, index) => {
+          const isMarked = isAttendanceMarked(elem.employeeId);
+          const markedStatus = markedAttendance[elem.employeeId];
+
+          return (
+            <div key={`${elem.employeeId}-${index}`} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-gray-900">{elem.fullName}</p>
+                  <p className="mt-1 text-xs text-gray-600">Department: {elem.department}</p>
+                  <p className="text-xs text-gray-600">ID: {elem.employeeId}</p>
+                </div>
+
+                {isMarked ? (
+                  <div
+                    className={`inline-flex w-24 shrink-0 items-center justify-center rounded-md border-2 px-2 py-1.5 text-xs font-semibold cursor-not-allowed ${
+                      markedStatus === "Present"
+                        ? "bg-green-50 border-green-300 text-green-500"
+                        : "bg-red-50 border-red-300 text-red-500"
+                    }`}
+                  >
+                    Marked ✓
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 justify-items-stretch gap-2">
+                    <button
+                      type="button"
+                      disabled={isSubmitting[elem.employeeId]}
+                      onClick={() => handleMarkAttendance(elem.employeeId, "Present")}
+                      className="w-24 rounded-md border-2 border-green-200 bg-green-100 px-2 py-1.5 text-center text-xs font-semibold text-green-800 transition hover:bg-green-200 disabled:opacity-70"
+                    >
+                      Present
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isSubmitting[elem.employeeId]}
+                      onClick={() => handleMarkAttendance(elem.employeeId, "Absent")}
+                      className="w-24 rounded-md border-2 border-red-200 bg-red-100 px-2 py-1.5 text-center text-xs font-semibold text-red-800 transition hover:bg-red-200 disabled:opacity-70"
+                    >
+                      Absent
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

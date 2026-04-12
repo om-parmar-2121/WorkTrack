@@ -53,8 +53,8 @@ const LeaveApplicationForm = ({ onClose }) => {
       backdropFilter: 'blur(4px)',
     }}>
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="bg-blue-600 text-white p-6 rounded-t-xl flex justify-between items-center">
-          <h2 className="text-2xl font-bold">Apply for Leave</h2>
+        <div className="bg-blue-600 text-white p-4 md:p-6 rounded-t-xl flex justify-between items-center">
+          <h2 className="text-xl font-bold md:text-2xl">Apply for Leave</h2>
           <button
             onClick={onClose}
             className="hover:bg-blue-700 p-2 rounded-full transition-colors"
@@ -64,7 +64,7 @@ const LeaveApplicationForm = ({ onClose }) => {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="space-y-6 p-4 md:p-6">
           {errorMessage ? (
             <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               {errorMessage}
@@ -119,7 +119,7 @@ const LeaveApplicationForm = ({ onClose }) => {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex flex-col gap-3 pt-4 sm:flex-row">
             <button
               type="button"
               onClick={onClose}

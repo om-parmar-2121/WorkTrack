@@ -78,10 +78,10 @@ const EmpDashboard = () => {
   ];
 
   return (
-    <div className="bg-gray-50 h-screen overflow-hidden flex flex-col">
+    <div className="bg-gray-50 min-h-screen overflow-hidden flex flex-col">
       <EmpTitleCard />
 
-      <div className="flex-1 overflow-hidden px-6 pb-4">
+      <div className="flex-1 overflow-hidden px-3 pb-4 md:px-6">
         <div className="max-w-7xl mx-auto w-full">
           <div className="grid grid-cols-1 xl:grid-cols-12 gap-4">
             <div className="xl:col-span-4 space-y-4">

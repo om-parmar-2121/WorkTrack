@@ -44,9 +44,9 @@ const EmpLeaveReqCards = ({
       {leaveRequests.map((leave) => (
         <div
           key={leave._id}
-          className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-green-300 transition-all"
+          className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-gray-50 p-4 transition-all hover:border-green-300 sm:flex-row sm:items-center sm:justify-between"
         >
-          <div className="flex items-center gap-4 flex-1">
+          <div className="flex flex-1 items-center gap-3 sm:gap-4">
             <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
               <span className="text-green-600 font-semibold text-lg">
                 {leave.employeeId?.fullName?.charAt(0) || "E"}
@@ -55,7 +55,7 @@ const EmpLeaveReqCards = ({
             <div className="flex-1">
               <p className="font-semibold text-gray-900">{leave.employeeId?.fullName || "-"}</p>
               <p className="text-sm text-gray-500">{leave.employeeId?.userId?.email || "-"}</p>
-              <div className="mt-2 flex items-center gap-3 text-xs text-gray-600">
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-600 sm:gap-3">
                 <span className="font-medium">{leave.reason || "-"}</span>
                 <span className="text-gray-400">•</span>
                 <span>
@@ -64,12 +64,12 @@ const EmpLeaveReqCards = ({
               </div>
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex w-full gap-2 sm:w-auto">
             <button
               type="button"
               disabled={processingId === leave._id}
               onClick={() => onApprove(leave._id)}
-              className="px-5 py-2 bg-green-100 text-green-900 border-2 border-green-300 hover:bg-green-200 text-sm font-medium rounded-lg transition-colors disabled:bg-green-300"
+              className="flex-1 rounded-lg border-2 border-green-300 bg-green-100 px-3 py-2 text-sm font-medium text-green-900 transition-colors hover:bg-green-200 disabled:bg-green-300 sm:flex-none sm:px-5"
             >
               {processingId === leave._id ? "Approving..." : "Approve"}
             </button>
@@ -77,7 +77,7 @@ const EmpLeaveReqCards = ({
               type="button"
               disabled={processingId === leave._id}
               onClick={() => onReject(leave._id)}
-              className="px-5 py-2 bg-white hover:bg-gray-100 text-gray-800 text-sm font-medium rounded-lg border-2 border-gray-200 transition-colors disabled:text-gray-400"
+              className="flex-1 rounded-lg border-2 border-gray-200 bg-white px-3 py-2 text-sm font-medium text-gray-800 transition-colors hover:bg-gray-100 disabled:text-gray-400 sm:flex-none sm:px-5"
             >
               {processingId === leave._id ? "Rejecting..." : "Reject"}
             </button>

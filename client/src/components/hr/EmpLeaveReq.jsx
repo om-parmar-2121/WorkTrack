@@ -61,13 +61,13 @@ const EmpLeaveReq = () => {
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 bg-linear-to-r from-green-100 to-white border-b border-gray-200">
+      <div className="border-b border-gray-200 bg-linear-to-r from-green-100 to-white px-4 py-4 md:px-6">
         <h2 className="text-xl font-semibold text-gray-800">Leave Requests</h2>
         <p className="text-xs text-gray-500 mt-1">
           {leaveRequests.length} pending
         </p>
       </div>
-      <div className="p-6 overflow-y-scroll max-h-75">
+      <div className="max-h-75 overflow-y-scroll p-4 md:p-6">
         <EmpLeaveReqCards
           leaveRequests={leaveRequests}
           isLoading={isLoading}

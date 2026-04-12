@@ -27,7 +27,7 @@ const EmployeeStates = ({ stats, isLoading }) => {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7">
       <div className="bg-white border-2 border-blue-200 rounded-xl p-4">
         <p className="text-xs uppercase tracking-wide text-blue-600 font-semibold">Total Employees</p>
         <p className="text-3xl font-bold text-gray-900 mt-2">{safeStats.totalEmployees}</p>

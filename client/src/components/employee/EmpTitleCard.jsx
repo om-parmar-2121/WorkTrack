@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { LogOut } from "lucide-react";
 import Background from "../../assets/images/HrNameBackground.jpg";
 import { logoutUser } from "../../services/authService";
 
@@ -39,33 +40,37 @@ const EmpTitleCard = () => {
 
   return (
     <div
-        className="rounded-xl shadow-lg p-4 mb-5 flex justify-between items-center mx-6 mt-6"
+        className="relative mx-3 mt-3 mb-4 flex flex-col gap-4 rounded-xl p-4 shadow-lg md:mx-6 md:mt-6 md:mb-5 md:flex-row md:items-center md:justify-between"
         style={{
           backgroundImage: `url(${Background})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}
       >
-        <div className="flex items-center gap-6">
-          <span className="h-20 w-20 rounded-full border-2 border-blue-500 bg-blue-50 text-blue-700 font-bold text-5xl flex items-center justify-center shrink-0">
+        <div className="flex items-center gap-3 md:gap-6">
+          <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-blue-500 bg-blue-50 text-3xl font-bold text-blue-700 md:h-20 md:w-20 md:text-5xl">
             {profileLetter}
           </span>
-          <div className="text-white">
-            <h1 className="text-4xl font-bold mb-2 flex items-center gap-2">
-              {finalName} <span className="text-4xl">👋</span>
+          <div className="min-w-0 text-white">
+            <h1 className="mb-1 flex items-center gap-2 text-2xl font-bold md:mb-2 md:text-4xl">
+              {finalName} <span className="text-2xl md:text-4xl">👋</span>
             </h1>
-            <p className="text-lg text-indigo-100">{user?.email || "employee@staffsphere.com"}</p>
+            <p className="truncate text-sm text-indigo-100 md:text-lg">{user?.email || "employee@staffsphere.com"}</p>
           </div>
         </div>
 
-        <div>
+        <div className="absolute right-3 top-3 flex flex-col items-end gap-1 md:right-4 md:top-4">
           <button
             type="button"
             onClick={handleLogout}
             disabled={isLoggingOut}
-            className="w-25 h-10 flex justify-center items-center rounded-lg border-2 border-red-200 text-red-600 bg-red-100 px-4 text-sm font-semibold transition-colors gap-2 disabled:opacity-70"
+            aria-label={isLoggingOut ? "Logging out" : "Log out"}
+            className="flex h-9 w-9 items-center justify-center rounded-lg border border-red-200 bg-red-100 text-red-600 transition-colors disabled:opacity-70 md:h-9 md:w-auto md:gap-1.5 md:px-3 md:text-sm"
           >
-            {isLoggingOut ? "Logging out..." : "Log Out"}
+            <span className="hidden md:inline">
+              {isLoggingOut ? "Logging out..." : "Log Out"}
+            </span>
+            <LogOut className="h-4 w-4" />
           </button>
           {errorMessage ? (
             <p className="text-xs text-red-100">{errorMessage}</p>

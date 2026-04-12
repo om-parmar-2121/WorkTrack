@@ -69,7 +69,7 @@ const EmployeeEditModal = ({ employee, onClose, onSaved }) => {
       style={{ backgroundColor: "rgba(15, 23, 42, 0.35)" }}
     >
       <div className="w-full max-w-xl rounded-xl bg-white shadow-2xl border border-blue-100 overflow-hidden">
-        <div className="flex items-center justify-between px-6 py-4 bg-blue-500 text-white">
+        <div className="flex items-center justify-between bg-blue-500 px-4 py-4 text-white md:px-6">
           <div>
             <h2 className="text-lg font-semibold">Employee Details</h2>
             <p className="text-xs text-blue-100 mt-1">{employee.fullName || "Employee"} ({employee.employeeId || "-"})</p>
@@ -84,7 +84,7 @@ const EmployeeEditModal = ({ employee, onClose, onSaved }) => {
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
           {errorMessage ? (
             <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {errorMessage}
@@ -130,7 +130,7 @@ const EmployeeEditModal = ({ employee, onClose, onSaved }) => {
             />
           </div>
 
-          <div className="pt-2 flex items-center justify-end gap-3">
+          <div className="pt-2 flex flex-col-reverse items-stretch justify-end gap-3 sm:flex-row sm:items-center">
             <button
               type="button"
               onClick={onClose}
