@@ -1,10 +1,56 @@
-const isLocalHost =
-	typeof window !== "undefined" &&
-	["localhost", "127.0.0.1"].includes(window.location.hostname);
+const isLocalhost =
+	window.location.hostname === "localhost" ||
+	window.location.hostname === "127.0.0.1";
 
-const API_BASE_URL = isLocalHost
+const API_BASE_URL = isLocalhost
 	? import.meta.env.VITE_LOCAL_API_URL || "http://localhost:5000"
 	: import.meta.env.VITE_API_URL || "http://localhost:5000";
+
+const SESSION_STORAGE_KEY = "staffsphereUser";
+
+const getStoredUser = () => {
+	const storedUser = localStorage.getItem(SESSION_STORAGE_KEY);
+
+	if (!storedUser) return null;
+
+	try {
+		return JSON.parse(storedUser);
+	} catch {
+		localStorage.removeItem(SESSION_STORAGE_KEY);
+		return null;
+	}
+};
+
+const decodeBase64Url = (value) => {
+	const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
+	const padding = normalized.length % 4;
+	const padded = padding ? normalized + "=".repeat(4 - padding) : normalized;
+	return atob(padded);
+};
+
+const isTokenExpired = (token) => {
+	if (!token) return true;
+
+	try {
+		const parts = token.split(".");
+		if (parts.length !== 3) return true;
+
+		const payload = JSON.parse(decodeBase64Url(parts[1]));
+		if (!payload?.exp) return false;
+
+		return payload.exp * 1000 <= Date.now();
+	} catch {
+		return true;
+	}
+};
+
+const clearSessionAndRedirect = () => {
+	localStorage.removeItem(SESSION_STORAGE_KEY);
+
+	if (window.location.pathname !== "/") {
+		window.location.replace("/");
+	}
+};
 
 const buildUrl = (path) => {
 	if (!path) return API_BASE_URL;
@@ -22,33 +68,23 @@ const parseResponse = async (response) => {
 	return response.text();
 };
 
-const getAuthHeader = () => {
-	const storedUser = localStorage.getItem("staffsphereUser");
-
-	if (!storedUser) return {};
-
-	try {
-		const user = JSON.parse(storedUser);
-		if (user?.token) {
-			return { Authorization: `Bearer ${user.token}` };
-		}
-	} catch {
-		// ignore malformed local storage values
-	}
-
-	return {};
-};
-
 const request = async (path, options = {}) => {
 	const { body, headers = {}, ...restOptions } = options;
 	const isFormData = body instanceof FormData;
+	const storedUser = getStoredUser();
+	const token = storedUser?.token;
+
+	if (token && isTokenExpired(token)) {
+		clearSessionAndRedirect();
+		throw new Error("Session expired. Please log in again.");
+	}
 
 	const response = await fetch(buildUrl(path), {
 		credentials: "include",
 		...restOptions,
 		headers: {
 			...(isFormData ? {} : { "Content-Type": "application/json" }),
-			...getAuthHeader(),
+			...(token ? { Authorization: `Bearer ${token}` } : {}),
 			...headers,
 		},
 		body: isFormData
@@ -64,6 +100,11 @@ const request = async (path, options = {}) => {
 		const message =
 			(typeof data === "object" && data?.message) ||
 			`Request failed with status ${response.status}`;
+
+		if (response.status === 401) {
+			clearSessionAndRedirect();
+		}
+
 		throw new Error(message);
 	}
 

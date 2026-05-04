@@ -1,6 +1,16 @@
 import "dotenv/config";
 
 const normalizeOrigin = (url) => (url || "").replace(/\/+$/, "");
+const splitOrigins = (value) =>
+  (value || "")
+    .split(",")
+    .map((entry) => normalizeOrigin(entry.trim()))
+    .filter(Boolean);
+
+const configuredOrigins = splitOrigins(process.env.CLIENT_URLS);
+const fallbackOrigins = splitOrigins(process.env.CLIENT_URL || "http://localhost:5173");
+const defaultOrigins = ["http://localhost:5173", "http://127.0.0.1:5173"];
+const CLIENT_URLS = Array.from(new Set([...configuredOrigins, ...fallbackOrigins, ...defaultOrigins]));
 
 const env = {
   PORT: process.env.PORT || 3000,
@@ -9,7 +19,8 @@ const env = {
   NODE_ENV: process.env.NODE_ENV || "development",
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRES: process.env.JWT_EXPIRES || "7d",
-  CLIENT_URL: normalizeOrigin(process.env.CLIENT_URL || "http://localhost:5173"),
+  CLIENT_URL: CLIENT_URLS[0],
+  CLIENT_URLS,
 };
 
 if (!env.MONGODB_URL) {
