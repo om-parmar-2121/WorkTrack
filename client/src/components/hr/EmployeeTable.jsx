@@ -72,6 +72,16 @@ const EmployeeTable = () => {
     });
   };
 
+  const handleEmployeeDeleted = (deletedEmployee) => {
+    if (!deletedEmployee?._id) return;
+
+    setEmployees((prevEmployees) =>
+      prevEmployees.filter((employee) => String(employee._id) !== String(deletedEmployee._id)),
+    );
+
+    setSelectedEmployee(null);
+  };
+
   return (
     <div className="flex h-full flex-col rounded-xl border border-gray-200 bg-white p-3 md:p-5">
       <div className="hidden min-h-0 flex-1 overflow-auto md:block">
@@ -198,6 +208,7 @@ const EmployeeTable = () => {
           employee={selectedEmployee}
           onClose={handleCloseModal}
           onSaved={handleEmployeeUpdated}
+          onDeleted={handleEmployeeDeleted}
         />
       ) : null}
     </div>

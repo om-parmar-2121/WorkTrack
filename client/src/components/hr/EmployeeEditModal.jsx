@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
-import { X } from "lucide-react";
-import { updateEmployee } from "../../services/employeeService";
+import { AlertTriangle, Trash2, X } from "lucide-react";
+import { deleteEmployee, updateEmployee } from "../../services/employeeService";
 
-const EmployeeEditModal = ({ employee, onClose, onSaved }) => {
+const EmployeeEditModal = ({ employee, onClose, onSaved, onDeleted }) => {
   const [formData, setFormData] = useState({
     position: "",
     department: "",
     workplace: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
@@ -61,6 +63,37 @@ const EmployeeEditModal = ({ employee, onClose, onSaved }) => {
     }
   };
 
+  const handleDeleteClick = () => {
+    setErrorMessage("");
+    setShowDeleteConfirm(true);
+  };
+
+  const handleCancelDelete = () => {
+    if (isDeleting) return;
+    setShowDeleteConfirm(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!employee?._id) {
+      setErrorMessage("Invalid employee selected");
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      setErrorMessage("");
+
+      const response = await deleteEmployee(employee._id);
+      onDeleted?.(response?.employee || employee);
+      onClose();
+    } catch (error) {
+      setErrorMessage(error.message || "Failed to delete employee");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
   if (!employee) return null;
 
   return (
@@ -88,6 +121,44 @@ const EmployeeEditModal = ({ employee, onClose, onSaved }) => {
           {errorMessage ? (
             <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {errorMessage}
+            </div>
+          ) : null}
+
+          {showDeleteConfirm ? (
+            <div className="rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 rounded-full bg-red-100 p-2 text-red-600">
+                  <AlertTriangle size={18} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-red-800">
+                    Delete employee account?
+                  </p>
+                  <p className="mt-1 text-sm text-red-700">
+                    This will permanently remove <span className="font-semibold">{employee.fullName || "this employee"}</span> and the linked user account.
+                  </p>
+
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                    <button
+                      type="button"
+                      onClick={handleCancelDelete}
+                      disabled={isDeleting}
+                      className="rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-70"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleConfirmDelete}
+                      disabled={isDeleting}
+                      className="inline-flex items-center justify-center gap-2 rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700 disabled:opacity-70"
+                    >
+                      <Trash2 size={16} />
+                      {isDeleting ? "Deleting..." : "Confirm Delete"}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : null}
 
@@ -130,7 +201,7 @@ const EmployeeEditModal = ({ employee, onClose, onSaved }) => {
             />
           </div>
 
-          <div className="pt-2 flex flex-col-reverse items-stretch justify-end gap-3 sm:flex-row sm:items-center">
+          <div className="pt-2 flex flex-col-reverse items-stretch justify-between gap-3 sm:flex-row sm:items-center">
             <button
               type="button"
               onClick={onClose}
@@ -139,13 +210,24 @@ const EmployeeEditModal = ({ employee, onClose, onSaved }) => {
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-4 py-2 rounded-md bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 disabled:opacity-70"
-            >
-              {isSubmitting ? "Saving..." : "Save Changes"}
-            </button>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <button
+                type="button"
+                onClick={handleDeleteClick}
+                disabled={isSubmitting || isDeleting}
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100 disabled:opacity-70"
+              >
+                <Trash2 size={16} />
+                Delete Employee
+              </button>
+              <button
+                type="submit"
+                disabled={isSubmitting || isDeleting}
+                className="px-4 py-2 rounded-md bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 disabled:opacity-70"
+              >
+                {isSubmitting ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
           </div>
         </form>
       </div>
