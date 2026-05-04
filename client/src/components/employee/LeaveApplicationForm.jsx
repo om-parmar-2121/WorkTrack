@@ -2,6 +2,32 @@ import { X } from "lucide-react";
 import { useState } from "react";
 import { submitLeaveRequest } from "../../services/leaveService";
 
+const toDateInputValue = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const getDateBounds = () => {
+  const today = new Date();
+  const minDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const maxDate = new Date(minDate);
+  maxDate.setDate(maxDate.getDate() + 365);
+
+  return {
+    minDate: toDateInputValue(minDate),
+    maxDate: toDateInputValue(maxDate),
+  };
+};
+
+const diffDaysInclusive = (startDate, endDate) => {
+  const start = new Date(`${startDate}T00:00:00`);
+  const end = new Date(`${endDate}T00:00:00`);
+  const days = Math.floor((end - start) / (24 * 60 * 60 * 1000)) + 1;
+  return days;
+};
+
 const LeaveApplicationForm = ({ onClose }) => {
   const [formData, setFormData] = useState({
     leaveType: "",
@@ -11,6 +37,7 @@ const LeaveApplicationForm = ({ onClose }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const { minDate, maxDate } = getDateBounds();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +52,31 @@ const LeaveApplicationForm = ({ onClose }) => {
 
     if (!formData.startDate || !formData.endDate || !formData.reason.trim()) {
       setErrorMessage("All fields are required");
+      return;
+    }
+
+    if (formData.startDate < minDate || formData.endDate < minDate) {
+      setErrorMessage("Leave dates cannot be in the past");
+      return;
+    }
+
+    if (formData.startDate > maxDate || formData.endDate > maxDate) {
+      setErrorMessage("Leave dates must be within one year from today");
+      return;
+    }
+
+    if (formData.endDate < formData.startDate) {
+      setErrorMessage("End date must be after start date");
+      return;
+    }
+
+    if (diffDaysInclusive(formData.startDate, formData.endDate) > 60) {
+      setErrorMessage("Leave duration cannot exceed 60 days");
+      return;
+    }
+
+    if (formData.reason.trim().length < 5) {
+      setErrorMessage("Reason must be at least 5 characters long");
       return;
     }
 
@@ -82,6 +134,8 @@ const LeaveApplicationForm = ({ onClose }) => {
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
+                min={minDate}
+                max={maxDate}
                 required
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
               />
@@ -96,6 +150,8 @@ const LeaveApplicationForm = ({ onClose }) => {
                 name="endDate"
                 value={formData.endDate}
                 onChange={handleChange}
+                min={formData.startDate || minDate}
+                max={maxDate}
                 required
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
               />

@@ -5,23 +5,66 @@ import User from "../models/user.model.js";
 import { asyncHandler } from "../utilities/asyncHandler.utility.js";
 import { errorHandler } from "../utilities/errorHandler.utility.js";
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+const parseIsoDateOnly = (value) => {
+  if (typeof value !== "string") return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+const startOfTodayUtc = () => {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+};
+
 export const createLeaveRequest = asyncHandler(async (req, res, next) => {
   const { startDate, endDate, reason } = req.body;
 
   if (!startDate || !endDate || !reason)
     return next(new errorHandler("All fields are required", 400));
 
+  const parsedStartDate = parseIsoDateOnly(startDate);
+  const parsedEndDate = parseIsoDateOnly(endDate);
+
+  if (!parsedStartDate || !parsedEndDate) {
+    return next(new errorHandler("Dates must be valid and use YYYY-MM-DD format", 400));
+  }
+
+  const todayUtc = startOfTodayUtc();
+  const maxFutureDate = new Date(todayUtc.getTime() + 365 * DAY_MS);
+
+  if (parsedStartDate < todayUtc) {
+    return next(new errorHandler("Start date cannot be in the past", 400));
+  }
+
   const employee = await Employee.findOne({ userId: req.user._id });
   if (!employee) return next(new errorHandler("Employee record not found", 404));
 
-  if (new Date(endDate) < new Date(startDate))
+  if (parsedEndDate < parsedStartDate)
     return next(new errorHandler("End date must be after start date", 400));
+
+  if (parsedStartDate > maxFutureDate || parsedEndDate > maxFutureDate) {
+    return next(new errorHandler("Leave dates must be within one year from today", 400));
+  }
+
+  const leaveDurationDays = Math.floor((parsedEndDate - parsedStartDate) / DAY_MS) + 1;
+
+  if (leaveDurationDays > 60) {
+    return next(new errorHandler("Leave duration cannot exceed 60 days", 400));
+  }
+
+  if (String(reason).trim().length < 5) {
+    return next(new errorHandler("Reason must be at least 5 characters long", 400));
+  }
 
   const leaveRequest = await Leave.create({
     employeeId: employee._id,
-    startDate,
-    endDate,
-    reason,
+    startDate: parsedStartDate,
+    endDate: parsedEndDate,
+    reason: reason.trim(),
     status: "pending"
   });
 
